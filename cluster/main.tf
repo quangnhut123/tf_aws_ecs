@@ -23,7 +23,7 @@ resource "aws_autoscaling_group" "app" {
   vpc_zone_identifier = var.vpc_zone_identifier
   default_cooldown    = var.asg_default_cooldown
 
-  tags = var.asg_extra_tags
+  tags = [var.asg_extra_tags]
 
   lifecycle {
     create_before_destroy = true
@@ -62,4 +62,3 @@ resource "aws_launch_configuration" "app" {
     create_before_destroy = true
   }
 }
-

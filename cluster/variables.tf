@@ -99,18 +99,8 @@ variable "asg_termination_policies" {
 
 variable "asg_extra_tags" {
   description = "AWS EC2 Tag for AutoScaling Group (and attached instances)"
-  type        = list(string)
-  default = [
-  ]
-  /*
-    # like: https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html#interpolated-tags
-    {
-      key                 = "Name"
-      name                = "Foo"
-      propagate_at_launch = true
-    },
-    { ...
-  */
+  type        = map(string)
+  default     = {}
 }
 
 variable "root_volume_size" {
@@ -227,4 +217,3 @@ variable "log_groups_tags" {
   type        = map(string)
   default     = {}
 }
-
