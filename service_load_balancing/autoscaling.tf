@@ -5,8 +5,6 @@
  */
 
 resource "aws_appautoscaling_target" "main" {
-  count = var.autoscale_iam_role_arn != "" ? 1 : 0
-
   max_capacity       = var.autoscale_max_capacity
   min_capacity       = var.autoscale_min_capacity
   resource_id        = "service/${var.cluster_name}/${var.name}"
