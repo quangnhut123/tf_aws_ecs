@@ -60,5 +60,6 @@ resource "aws_launch_configuration" "app" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = [ami_id]
   }
 }
