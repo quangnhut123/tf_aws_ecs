@@ -1,15 +1,10 @@
 // NOTE: var.launch_type = "FARGATE" if you want use following
 
-resource "aws_ecs_cluster" "fargate" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
-  name  = var.cluster_name
-}
-
 resource "aws_ecs_service" "fargate" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
   name            = var.name
-  cluster         = aws_ecs_cluster.fargate[0].id
+  cluster         = var.cluster_id
   launch_type     = var.launch_type
   task_definition = aws_ecs_task_definition.fargate[0].arn
 
@@ -81,15 +76,15 @@ EOF
 resource "aws_iam_role_policy" "fargate" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
-  name = "ecsTaskExecutionRolePolicy-${var.name}"
-  role = aws_iam_role.fargate[0].name
+  name   = "ecsTaskExecutionRolePolicy-${var.name}"
+  role   = aws_iam_role.fargate[0].name
   policy = var.iam_role_inline_policy
 }
 
 resource "aws_iam_role_policy_attachment" "fargate_task_execution" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
-  role = aws_iam_role.fargate[0].name
+  role       = aws_iam_role.fargate[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 

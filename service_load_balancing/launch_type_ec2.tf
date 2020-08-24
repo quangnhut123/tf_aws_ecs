@@ -77,8 +77,8 @@ EOF
 resource "aws_iam_role_policy" "ecs_service" {
   count = var.launch_type == "EC2" ? 1 : 0
 
-  name = "${var.name}-ecs-service-policy"
-  role = aws_iam_role.ecs_service[0].name
+  name   = "${var.name}-ecs-service-policy"
+  role   = aws_iam_role.ecs_service[0].name
   policy = var.iam_role_inline_policy
 }
 
