@@ -42,30 +42,52 @@ resource "aws_ecs_task_definition" "fargate" {
   container_definitions    = var.container_definitions
   network_mode             = var.network_mode
   requires_compatibilities = [var.launch_type]
-  task_role_arn            = aws_iam_role.fargate[0].arn
+  execution_role_arn       = aws_iam_role.fargate_ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.fargate_ecs_task_role.arn
   depends_on = [
     aws_iam_role_policy.fargate,
     aws_iam_role_policy_attachment.fargate_task_execution,
   ]
 }
 
-resource "aws_iam_role" "fargate" {
+resource "aws_iam_role" "fargate_ecs_task_execution_role" {
+  count = var.launch_type == "FARGATE" ? 1 : 0
+  name  = "ecsTaskExecutionRole-${var.name}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "fargate_ecs_task_role" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
-  name                  = "ecsTaskExecutionRole-${var.name}"
+  name                  = "ecsTaskRole-${var.name}"
   path                  = var.iam_path
   force_detach_policies = true
   assume_role_policy    = <<EOF
 {
-  "Version": "2008-10-17",
+  "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "",
-      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "ecs.amazonaws.com"
+        "Service": "ecs-tasks.amazonaws.com"
       },
-      "Action": "sts:AssumeRole"
+      "Effect": "Allow",
+      "Sid": ""
     }
   ]
 }
@@ -77,14 +99,14 @@ resource "aws_iam_role_policy" "fargate" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
   name   = "ecsTaskExecutionRolePolicy-${var.name}"
-  role   = aws_iam_role.fargate[0].name
+  role   = aws_iam_role.fargate_ecs_task_role.name
   policy = var.iam_role_inline_policy
 }
 
 resource "aws_iam_role_policy_attachment" "fargate_task_execution" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
-  role       = aws_iam_role.fargate[0].name
+  role       = aws_iam_role.fargate_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
