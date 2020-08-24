@@ -42,6 +42,8 @@ resource "aws_ecs_task_definition" "fargate" {
   container_definitions    = var.container_definitions
   network_mode             = var.network_mode
   requires_compatibilities = [var.launch_type]
+  cpu                      = var.container_cpu
+  memory                   = var.container_memory
   execution_role_arn       = aws_iam_role.fargate_ecs_task_execution_role[0].arn
   task_role_arn            = aws_iam_role.fargate_ecs_task_role[0].arn
   depends_on = [
