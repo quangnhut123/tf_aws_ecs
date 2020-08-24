@@ -49,6 +49,7 @@ resource "aws_ecs_task_definition" "fargate" {
   depends_on = [
     aws_iam_role_policy.fargate,
     aws_iam_role_policy_attachment.fargate_task_execution,
+    aws_iam_role_policy.fargate_execution,
   ]
 }
 
@@ -110,5 +111,29 @@ resource "aws_iam_role_policy_attachment" "fargate_task_execution" {
 
   role       = aws_iam_role.fargate_ecs_task_execution_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+// permissions to collect ECS Fargate metrics
+resource "aws_iam_role_policy" "fargate_execution" {
+  count = var.launch_type == "FARGATE" ? 1 : 0
+
+  name   = "ecsTaskExecutionRoleFargatePolicy-${var.name}"
+  role   = aws_iam_role.fargate_ecs_task_execution_role[0].name
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecs:ListClusters",
+        "ecs:ListContainerInstances",
+        "ecs:DescribeContainerInstances"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
 
