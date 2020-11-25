@@ -3,6 +3,8 @@
 resource "aws_ecs_service" "fargate" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
+  platform_version = var.platform_version
+
   name            = var.name
   cluster         = var.cluster_id
   launch_type     = var.launch_type

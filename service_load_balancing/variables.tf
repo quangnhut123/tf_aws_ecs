@@ -6,6 +6,13 @@ variable "cluster_name" {
   description = "Name of ECS Cluster using for autoscaling"
 }
 
+variable "platform_version" {
+  # Applies to Fargate only.
+  description = "FARGATE platform version on which to run your service."
+  type        = string
+  default     = "LATEST"
+}
+
 variable "launch_type" {
   description = "The launch type on which to run your service (EC2 / FARGATE)"
   default     = "EC2"
