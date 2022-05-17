@@ -129,10 +129,12 @@ variable "target_group_arn" {
 
 variable "container_name" {
   description = "AWS containers name as related load_balancer"
+  default     = ""
 }
 
 variable "container_port" {
   description = "AWS containers port"
+  default     = ""
 }
 
 variable "container_family" {
