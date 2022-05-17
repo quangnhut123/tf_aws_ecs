@@ -1,14 +1,14 @@
-// NOTE: var.launch_type = "FARGATE" if you want use following
+// NOTE: var.launch_type = "FARGATE_NO_ALB" if you want use following
 
-resource "aws_ecs_service" "fargate" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_ecs_service" "fargate_no_alb" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
   platform_version = var.platform_version
 
   name            = var.name
   cluster         = var.cluster_id
-  launch_type     = var.launch_type
-  task_definition = aws_ecs_task_definition.fargate[0].arn
+  launch_type     = "FARGATE"
+  task_definition = aws_ecs_task_definition.fargate_no_alb[0].arn
 
   # As below is can be running in a service during a deployment
   desired_count                      = var.desired_count
@@ -21,12 +21,6 @@ resource "aws_ecs_service" "fargate" {
     security_groups  = var.security_group_ids
   }
 
-  load_balancer {
-    target_group_arn = var.target_group_arn
-    container_name   = var.container_name
-    container_port   = var.container_port
-  }
-
   lifecycle {
     # INFO: In the future, we support that U can customize
     #       https://github.com/hashicorp/terraform/issues/3116
@@ -37,26 +31,26 @@ resource "aws_ecs_service" "fargate" {
   }
 }
 
-resource "aws_ecs_task_definition" "fargate" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_ecs_task_definition" "fargate_no_alb" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
   family                   = var.container_family
   container_definitions    = var.container_definitions
   network_mode             = var.network_mode
-  requires_compatibilities = [var.launch_type]
+  requires_compatibilities = ["FARGATE"]
   cpu                      = var.container_cpu
   memory                   = var.container_memory
-  execution_role_arn       = aws_iam_role.fargate_ecs_task_execution_role[0].arn
-  task_role_arn            = aws_iam_role.fargate_ecs_task_role[0].arn
+  execution_role_arn       = aws_iam_role.fargate_no_alb_ecs_task_execution_role[0].arn
+  task_role_arn            = aws_iam_role.fargate_no_alb_ecs_task_role[0].arn
   depends_on = [
-    aws_iam_role_policy.fargate,
-    aws_iam_role_policy_attachment.fargate_task_execution,
-    aws_iam_role_policy.fargate_execution,
+    aws_iam_role_policy.fargate_no_alb,
+    aws_iam_role_policy_attachment.fargate_no_alb_task_execution,
+    aws_iam_role_policy.fargate_no_alb_execution,
   ]
 }
 
-resource "aws_iam_role" "fargate_ecs_task_execution_role" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_iam_role" "fargate_no_alb_ecs_task_execution_role" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
   name  = "ecsTaskExecutionRole-${var.name}"
 
   assume_role_policy = <<EOF
@@ -76,8 +70,8 @@ resource "aws_iam_role" "fargate_ecs_task_execution_role" {
 EOF
 }
 
-resource "aws_iam_role" "fargate_ecs_task_role" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_iam_role" "fargate_no_alb_ecs_task_role" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
   name                  = "ecsTaskRole-${var.name}"
   path                  = var.iam_path
@@ -100,27 +94,27 @@ EOF
 
 }
 
-resource "aws_iam_role_policy" "fargate" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_iam_role_policy" "fargate_no_alb" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
   name   = "ecsTaskExecutionRolePolicy-${var.name}"
-  role   = aws_iam_role.fargate_ecs_task_role[0].name
+  role   = aws_iam_role.fargate_no_alb_ecs_task_role[0].name
   policy = var.iam_role_inline_policy
 }
 
-resource "aws_iam_role_policy_attachment" "fargate_task_execution" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_iam_role_policy_attachment" "fargate_no_alb_task_execution" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
-  role       = aws_iam_role.fargate_ecs_task_execution_role[0].name
+  role       = aws_iam_role.fargate_no_alb_ecs_task_execution_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 // permissions to collect ECS Fargate metrics
-resource "aws_iam_role_policy" "fargate_execution" {
-  count = var.launch_type == "FARGATE" ? 1 : 0
+resource "aws_iam_role_policy" "fargate_no_alb_execution" {
+  count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
   name   = "ecsTaskExecutionRoleFargatePolicy-${var.name}"
-  role   = aws_iam_role.fargate_ecs_task_execution_role[0].name
+  role   = aws_iam_role.fargate_no_alb_ecs_task_execution_role[0].name
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -138,4 +132,3 @@ resource "aws_iam_role_policy" "fargate_execution" {
 }
 EOF
 }
-
