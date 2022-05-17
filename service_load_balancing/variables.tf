@@ -122,6 +122,7 @@ variable "placement_strategy_field" {
 
 variable "target_group_arn" {
   description = "The ARN of the ALB target group to associate with the service"
+  default     = ""
 }
 
 # Container
