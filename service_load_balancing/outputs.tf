@@ -25,3 +25,19 @@ output "fargate_ecs_task_role_name" {
 output "fargate_ecs_task_execution_role_name" {
   value = length(aws_iam_role.fargate_ecs_task_execution_role) > 0 ? aws_iam_role.fargate_ecs_task_execution_role[0].name : ""
 }
+
+output "fargate_no_alb_ecs_task_role_arn" {
+  value = length(aws_iam_role.fargate_no_alb_ecs_task_role) > 0 ? aws_iam_role.fargate_no_alb_ecs_task_role[0].arn : ""
+}
+
+output "fargate_no_alb_ecs_task_execution_role_arn" {
+  value = length(aws_iam_role.fargate_no_alb_ecs_task_execution_role) > 0 ? aws_iam_role.fargate_no_alb_ecs_task_execution_role[0].arn : ""
+}
+
+output "fargate_no_alb_ecs_task_role_name" {
+  value = length(aws_iam_role.fargate_no_alb_ecs_task_role) > 0 ? aws_iam_role.fargate_no_alb_ecs_task_role[0].name : ""
+}
+
+output "fargate_no_alb_ecs_task_execution_role_name" {
+  value = length(aws_iam_role.fargate_no_alb_ecs_task_execution_role) > 0 ? aws_iam_role.fargate_no_alb_ecs_task_execution_role[0].name : ""
+}
