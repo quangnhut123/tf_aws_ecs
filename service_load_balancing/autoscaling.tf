@@ -12,6 +12,11 @@ resource "aws_appautoscaling_target" "main" {
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
   depends_on = [aws_ecs_service.main]
+  lifecycle {
+    ignore_changes = [
+      max_capacity,
+    ]
+  }
 }
 
 // Memory Utilization
