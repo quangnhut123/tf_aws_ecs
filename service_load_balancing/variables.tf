@@ -89,6 +89,12 @@ EOT
 
 # ECS launch_type: FARGATE
 
+variable "assign_public_ip" {
+  description = "Auto assign public IP"
+  default     = false
+}
+
+
 variable "subnet_ids" {
   description = "AWS vpc zone identifier(s)"
   type        = list(string)
