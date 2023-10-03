@@ -64,3 +64,55 @@ resource "aws_launch_configuration" "app" {
     ignore_changes = [image_id]
   }
 }
+
+#Launch template for main cluster
+resource "aws_launch_template" "app" {
+  name_prefix = "${aws_ecs_cluster.main.name}-launch-template-"
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size           = var.root_volume_size
+      delete_on_termination = var.delete_on_termination
+      encrypted             = var.encrypted
+      volume_type           = var.ebs_volume_type
+    }
+  }
+
+  capacity_reservation_specification {
+    capacity_reservation_preference = "open"
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ecs_instance.name
+  }
+
+  monitoring {
+    enabled = true
+  }
+
+  network_interfaces {
+    associate_public_ip_address = var.associate_public_ip_address
+    security_groups             = var.security_groups
+  }
+  disable_api_termination              = var.disable_api_termination
+  ebs_optimized                        = var.ebs_optimized
+  image_id                             = var.ami_id
+  instance_initiated_shutdown_behavior = "terminate"
+  update_default_version               = true
+  instance_type                        = var.instance_type
+  key_name                             = var.key_name
+  user_data                            = var.user_data
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "${aws_ecs_cluster.main.name}-launch-template"
+    }
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
