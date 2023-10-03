@@ -66,6 +66,14 @@ resource "aws_launch_configuration" "app" {
 }
 
 #Launch template for main cluster
+
+data "template_file" "user_data" {
+  template = <<EOF
+    #!/bin/bash
+    echo ECS_CLUSTER=${var.name} >> /etc/ecs/ecs.config
+  EOF
+}
+
 resource "aws_launch_template" "app" {
   name_prefix = "${aws_ecs_cluster.main.name}-launch-template-"
 
@@ -103,7 +111,7 @@ resource "aws_launch_template" "app" {
   update_default_version               = true
   instance_type                        = var.instance_type
   key_name                             = var.key_name
-  user_data                            = var.user_data
+  user_data                            = "${base64encode(data.template_file.user_data.rendered)}"
   tag_specifications {
     resource_type = "instance"
 
