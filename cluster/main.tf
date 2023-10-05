@@ -9,11 +9,14 @@ resource "aws_cloudwatch_log_group" "ecs_agent" {
 }
 
 resource "aws_autoscaling_group" "app" {
-  name            = aws_ecs_cluster.main.name
-  enabled_metrics = var.asg_enabled_metrics
-
-  launch_configuration = aws_launch_configuration.app.name
+  name                 = aws_ecs_cluster.main.name
+  enabled_metrics      = var.asg_enabled_metrics
   termination_policies = var.asg_termination_policies
+
+  launch_template {
+    id      = aws_launch_template.app.id
+    version = "$Latest"
+  }
 
   # NOTE: this module no handled desired capacity
   #desired_capacity     = "${var.asg_desired}"
@@ -30,38 +33,6 @@ resource "aws_autoscaling_group" "app" {
 
     # NOTE: changed automacally by autoscale policy
     ignore_changes = [desired_capacity]
-  }
-}
-
-resource "aws_launch_configuration" "app" {
-  name_prefix                 = "${aws_ecs_cluster.main.name}-"
-  security_groups             = var.security_groups
-  key_name                    = var.key_name
-  image_id                    = var.ami_id
-  instance_type               = var.instance_type
-  ebs_optimized               = var.ebs_optimized
-  iam_instance_profile        = aws_iam_instance_profile.ecs_instance.name
-  user_data                   = var.user_data
-  associate_public_ip_address = var.associate_public_ip_address
-  enable_monitoring           = true
-
-  root_block_device {
-    volume_type           = "gp2"
-    volume_size           = var.root_volume_size
-    delete_on_termination = true
-    encrypted             = true
-  }
-
-  # NOTE: Currently no-support to customizing block device(s)
-  #   - OS specified image_id is not always using /dev/xvdcz as docker storage
-  #   - As a workaround, creates the ami that it is customizing to the block device mappings
-  #
-  # DOCS: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-ami-storage-config.html
-  #ebs_block_device  { device_name = "/dev/xvdcz" }
-
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes = [image_id]
   }
 }
 
