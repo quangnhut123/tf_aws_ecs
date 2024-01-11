@@ -1,5 +1,8 @@
 // NOTE: var.launch_type = "FARGATE" if you want use following
-
+locals {
+  enable_service_discovery = var.enable_service_discovery
+  service_discovery_registry_arn = var.enable_service_discovery && var.service_discovery_registry_arn != "" ? var.service_discovery_registry_arn : null
+}
 resource "aws_ecs_service" "fargate" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
@@ -25,6 +28,13 @@ resource "aws_ecs_service" "fargate" {
     target_group_arn = var.target_group_arn
     container_name   = var.container_name
     container_port   = var.container_port
+  }
+
+  dynamic "service_registries" {
+    for_each = local.enable_service_discovery ? [1] : []
+    content {
+      registry_arn   = local.service_discovery_registry_arn
+    }
   }
 
   lifecycle {
