@@ -241,3 +241,15 @@ variable "encrypted" {
   type        = bool
   default     = true
 }
+
+variable "s3_policy" {
+  description = "Determines whether to add s3 policy for task role"
+  type        = bool
+  default     = false
+}
+
+variable "bucket_arn_list" {
+  description = "The list of bucket arn need to apply policy"
+  type        = list(string)
+  default     = []
+}

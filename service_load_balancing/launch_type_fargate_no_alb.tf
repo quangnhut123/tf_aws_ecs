@@ -94,6 +94,35 @@ EOF
 
 }
 
+resource "aws_iam_role_policy" "fargate_no_alb_s3" {
+  count = var.launch_type == "FARGATE_NO_ALB" && var.s3_policy ? 1 : 0
+
+  name   = "ecsTaskRoleS3PolicyNoAlb-${var.name}"
+  role   = aws_iam_role.fargate_ecs_task_role[0].name
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? ${var.bucket_arn_list} : null
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? [ for arn in ${var.bucket_arn_list} : "${arn}/*" ] : null
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role_policy" "fargate_no_alb" {
   count = var.launch_type == "FARGATE_NO_ALB" ? 1 : 0
 
