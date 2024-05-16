@@ -118,35 +118,6 @@ resource "aws_iam_role_policy" "fargate" {
   policy = var.iam_role_inline_policy
 }
 
-resource "aws_iam_role_policy" "fargate_s3" {
-  count = var.launch_type == "FARGATE" && var.s3_policy ? 1 : 0
-
-  name   = "ecsTaskRoleS3Policy-${var.name}"
-  role   = aws_iam_role.fargate_ecs_task_role[0].name
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket",
-        "s3:GetBucketLocation"
-      ],
-      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? ${var.bucket_arn_list} : null
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:*"
-      ],
-      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? [ for arn in ${var.bucket_arn_list} : "${arn}/*" ] : null
-    }
-  ]
-}
-EOF
-}
-
 resource "aws_iam_role_policy_attachment" "fargate_task_execution" {
   count = var.launch_type == "FARGATE" ? 1 : 0
 
