@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "s3_policy_document" {
     actions = [
       "s3:*",
     ]
-    resources = var.s3_policy && length(var.bucket_arn_list) > 0 ? [ for arn in var.bucket_arn_list : "${arn}/*" ] : null
+    resources = var.s3_policy && length(var.bucket_arn_list) > 0 ? [ for arn in var.bucket_arn_list : "${arn}/*" ] : ""
 
   }
 }
