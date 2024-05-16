@@ -133,14 +133,14 @@ resource "aws_iam_role_policy" "fargate_s3" {
         "s3:ListBucket",
         "s3:GetBucketLocation"
       ],
-      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? ${var.bucket_arn_list} : ["null"]
+      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? ${var.bucket_arn_list} : ""
     },
     {
       "Effect": "Allow",
       "Action": [
         "s3:*"
       ],
-      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? [ for arn in ${var.bucket_arn_list} : "${arn}/*" ] : ["null"]
+      "Resource": ${var.s3_policy} && length(${var.bucket_arn_list}) > 0 ? [ for arn in ${var.bucket_arn_list} : "${arn}/*" ] : ""
     }
   ]
 }
