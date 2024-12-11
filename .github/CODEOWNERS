@@ -1,8 +1,0 @@
-# the usage of this file: https://help.github.com/articles/about-codeowners/
-
-## QualityPIC
-# @moneyforwardvietnam/mfv-infra-reviewers
-* @moneyforwardvietnam/mfv-infra-reviewers
-
-## CODEOWNERS
-.github/CODEOWNERS  @moneyforwardvietnam/mfv-infra-reviewers
