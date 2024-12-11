@@ -16,7 +16,7 @@ resource "aws_ecs_service" "fargate_no_alb" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
 
   network_configuration {
-    assign_public_ip = true
+    assign_public_ip = var.assign_public_ip
     subnets          = var.subnet_ids
     security_groups  = var.security_group_ids
   }

@@ -217,3 +217,27 @@ variable "log_groups_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "disable_api_termination" {
+  description = "whether disable api termination"
+  type        = bool
+  default     = true
+}
+
+variable "ebs_volume_type" {
+  description = "ebs volume_type"
+  type        = string
+  default     = "gp2"
+}
+
+variable "delete_on_termination" {
+  description = "whether delete on termination"
+  type        = bool
+  default     = true
+}
+
+variable "encrypted" {
+  description = "whether encrypted ebs"
+  type        = bool
+  default     = true
+}

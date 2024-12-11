@@ -89,6 +89,12 @@ EOT
 
 # ECS launch_type: FARGATE
 
+variable "assign_public_ip" {
+  description = "Auto assign public IP"
+  default     = false
+}
+
+
 variable "subnet_ids" {
   description = "AWS vpc zone identifier(s)"
   type        = list(string)
@@ -267,3 +273,14 @@ variable "scale_in_step_adjustment" {
   }
 }
 
+variable "enable_service_discovery" {
+  description = "Determines whether to enable service discovery"
+  type        = bool
+  default     = false
+}
+
+variable "service_discovery_registry_arn" {
+  description = "The ARN of service discovery as arn:aws:servicediscovery:ap-northeast-1:xxxxxxxxx:service/srv-xxxxxxxxxxxxxxxxx"
+  type        = string
+  default     = ""
+}
